@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AlloyOptimisationUtility/AlloyOptimisationUtility.csproj" />
+  <Project Path="AlloyOptimisationUtilityTests/AlloyOptimisationUtilityTests.csproj" Id="45b10cd6-bac3-4950-a97b-e1b6d59ce036" />
+  <Project Path="DesignPatternsAndPrinciples/DesignPatternsAndPrinciples.csproj" Id="993af88e-d38c-42b5-abe1-e6df01ab8772" />
+  <Project Path="DesignPatternsAndPrinciplesTests/DesignPatternsAndPrinciplesTests.csproj" Id="cf9d8a63-8a8c-41fd-970c-c04ab62e6966" />
+</Solution>
