@@ -1,3 +1,5 @@
+using DesignPatternsAndPrinciples.Markets;
+
 namespace DesignPatternsAndPrinciples
 {
     /// <summary>
@@ -11,6 +13,9 @@ namespace DesignPatternsAndPrinciples
     {
         /// <summary>Returns every feature currently offered.</summary>
         IReadOnlyCollection<FeatureDefinition> GetAll();
+
+        /// <summary>Returns only the features that may be sold in the given country.</summary>
+        IReadOnlyCollection<FeatureDefinition> GetAvailableIn(Country country);
 
         /// <summary>
         /// Attempts to resolve a single feature by its stable <see cref="FeatureDefinition.Key"/>.

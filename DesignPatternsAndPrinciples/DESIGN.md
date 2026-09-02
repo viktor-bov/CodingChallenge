@@ -158,6 +158,70 @@ AmMachine machine = AmMachineFactory.Create(
 
 ---
 
+## Part 3 — Multi-Currency & Multi-Country Export
+
+**Requirement:** machines are now exported worldwide. Prices are authored in GBP but must be
+quoted in each destination country's currency, and each optional feature may be available in
+every country (global) or restricted to specific markets.
+
+The existing Decorator + data-driven catalog was **extended additively** — the machine cost
+core (`AmMachine.Cost()`) stays a GBP `decimal`, so all previous behaviour and tests remain
+valid. Localisation and availability are layered on top.
+
+### New building blocks
+
+| Type | Namespace | Responsibility |
+|------|-----------|----------------|
+| `Currency` (record) | `Pricing` | ISO code + symbol. Ready-made `Gbp`, `Usd`, `Eur`, `Jpy`. |
+| `Money` (readonly struct) | `Pricing` | An amount paired with its `Currency`, preventing accidental currency mixing. |
+| `Country` (record) | `Markets` | ISO code, name, and the `DefaultCurrency` prices are quoted in there. |
+| `ICurrencyConverter` (interface) | `Pricing` | **Extension seam** for FX conversion — swap a mock, a cached feed, or a live service without recompiling. |
+| `InMemoryCurrencyConverter` | `Pricing` | Mock converter using a hardcoded rate table relative to a base currency (GBP). |
+| `MachineQuote` (record) | `Pricing` | Result of pricing a machine for a market: description, country, base (GBP) price and localised price. |
+
+### Feature availability
+
+`FeatureDefinition` gained an optional `AvailableCountries` set and an `IsAvailableIn(country)`
+helper. An empty/absent set means the feature is **global**; a non-empty set restricts it to
+the listed markets. `IFeatureCatalog.GetAvailableIn(country)` returns only the sellable
+features for a market.
+
+### Factory extensions
+
+```csharp
+// Compose a machine for a market, rejecting features not sold there.
+AmMachine CreateForCountry(MachinePower power, IFeatureCatalog catalog, Country country, params IEnumerable<string> featureKeys)
+
+// Convert the composed GBP cost into the country's currency (or an explicit one).
+MachineQuote Quote(AmMachine machine, Country country, ICurrencyConverter converter, Currency? quoteCurrency = null)
+```
+
+### Usage
+
+```csharp
+IFeatureCatalog catalog = new InMemoryFeatureCatalog();
+ICurrencyConverter converter = new InMemoryCurrencyConverter(); // later: live FX service
+
+AmMachine machine = AmMachineFactory.CreateForCountry(
+    MachinePower.Medium, catalog, Country.UnitedStates,
+    "reduced-build-volume", "quad-laser", "powder-recirculation");
+
+MachineQuote quote = AmMachineFactory.Quote(machine, Country.UnitedStates, converter);
+Console.WriteLine(quote.LocalPrice); // e.g. $1,183,640.00 USD
+```
+
+### Design principles reinforced
+
+- **Open/Closed Principle** — new currencies, countries and FX sources are new data or a new
+  `ICurrencyConverter` implementation; existing machine/feature/decorator code is untouched.
+- **Dependency Inversion Principle** — pricing depends on the `ICurrencyConverter` and
+  `IFeatureCatalog` abstractions, so the FX source and feature source can be swapped freely.
+- **Single Responsibility** — `Money` carries amount+currency, `Country` maps a market to its
+  currency, the converter performs FX, the catalog filters availability, and the factory
+  composes and quotes.
+
+---
+
 ## Part 2E — Required Test
 
 `MediumMachine_WithReducedVolume_QuadLaser_PowderRecirculation_Costs932000` asserts:

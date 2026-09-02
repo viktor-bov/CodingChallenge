@@ -1,3 +1,5 @@
+using DesignPatternsAndPrinciples.Markets;
+
 namespace DesignPatternsAndPrinciples
 {
     /// <summary>
@@ -24,10 +26,21 @@ namespace DesignPatternsAndPrinciples
 
         public IReadOnlyCollection<FeatureDefinition> GetAll() => _features.Values.ToList();
 
+        public IReadOnlyCollection<FeatureDefinition> GetAvailableIn(Country country)
+        {
+            ArgumentNullException.ThrowIfNull(country);
+            return _features.Values.Where(f => f.IsAvailableIn(country)).ToList();
+        }
+
         public bool TryGet(string key, out FeatureDefinition feature) =>
             _features.TryGetValue(key, out feature!);
 
         // The mocked data. Replace this method (or the whole class) with a real source.
+        // Features with no country set are global (available everywhere); a non-empty set
+        // restricts the feature to specific export markets.
+        //
+        // Base machines are authored separately as data in an IBaseMachineCatalog (see
+        // InMemoryBaseMachineCatalog); this catalog holds only the optional features.
         private static IEnumerable<FeatureDefinition> DefaultFeatures() =>
         [
             new FeatureDefinition("reduced-build-volume", "Reduced Build Volume", 75_000m),
@@ -35,6 +48,12 @@ namespace DesignPatternsAndPrinciples
             new FeatureDefinition("powder-recirculation", "Powder Recirculation System", 82_000m),
             new FeatureDefinition("thermal-imaging-camera", "Thermal Imaging Camera", 54_000m),
             new FeatureDefinition("photodiodes", "Photodiodes", 63_000m),
+            // Example of a country-restricted feature: only sold in the United States.
+            new FeatureDefinition(
+                "high-power-export-pack",
+                "High Power Export Pack",
+                48_000m,
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase) { Country.UnitedStates.Code }),
         ];
     }
 }
