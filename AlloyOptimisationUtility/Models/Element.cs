@@ -2,11 +2,11 @@ namespace AlloyOptimisationUtility.Models
 {
     public sealed class Element
     {
-        public Element(string symbol, double costCoefficient, double? creepCoefficient = null)
+        public Element(ElementSymbol symbol, double costCoefficient, double? creepCoefficient = null)
         {
-            if (string.IsNullOrWhiteSpace(symbol))
+            if (!Enum.IsDefined(symbol))
             {
-                throw new ArgumentException("Element symbol must be provided.", nameof(symbol));
+                throw new ArgumentException("Element symbol must be a defined value.", nameof(symbol));
             }
 
             if (costCoefficient < 0)
@@ -19,7 +19,10 @@ namespace AlloyOptimisationUtility.Models
             CreepCoefficient = creepCoefficient;
         }
 
-        public string Symbol { get; }
+        public ElementSymbol Symbol { get; }
+
+        /// <summary>The element's atomic number in the periodic table.</summary>
+        public int AtomicNumber => (int)Symbol;
 
         public double CostCoefficient { get; }
 
@@ -27,6 +30,6 @@ namespace AlloyOptimisationUtility.Models
 
         public double EffectiveCreepCoefficient => CreepCoefficient ?? 0d;
 
-        public override string ToString() => Symbol;
+        public override string ToString() => Symbol.ToString();
     }
 }

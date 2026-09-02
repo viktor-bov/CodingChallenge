@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AlloyOptimisationUtility\AlloyOptimisationUtility.csproj" />
+    <ProjectReference Include="..\AlloyOptimisation\AlloyOptimisation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

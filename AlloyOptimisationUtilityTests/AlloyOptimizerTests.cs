@@ -1,13 +1,17 @@
+using AlloyOptimisation;
+using AlloyOptimisation.Data;
 using AlloyOptimisationUtility;
 using AlloyOptimisationUtility.Models;
 using AlloyOptimisationUtility.Services;
-using AlloyOptimisationUtilityTests.Models;
 
 namespace AlloyOptimisationUtilityTests
 {
     [Trait("Category", "Unit")]
     public class AlloyOptimizerTests
     {
+        private static AlloySystem CreateNickelSystem() =>
+            new NickelAlloyFactory(new MockElementCostRepository()).CreateSystem();
+
         private static IAlloyOptimizer CreateOptimizer(Currency currency, out ICostCalculator costCalculator)
         {
             costCalculator = new CostCalculator(currency);
@@ -20,7 +24,7 @@ namespace AlloyOptimisationUtilityTests
         [Fact]
         public void Optimise_NickelAlloy_FindsExpectedMaximumCreepResistance()
         {
-            var system = NickelAlloyFactory.CreateSystem();
+            var system = CreateNickelSystem();
             var optimizer = CreateOptimizer(Currency.Gbp, out _);
 
             var result = optimizer.Optimise(system, NickelAlloyFactory.MaximumCost);
@@ -37,7 +41,7 @@ namespace AlloyOptimisationUtilityTests
         {
             // Even 100% of the cheapest element (Ni at £8.9) exceeds £1, but the base
             // element cannot be varied to 100 while alloying minima are positive.
-            var system = NickelAlloyFactory.CreateSystem();
+            var system = CreateNickelSystem();
             var optimizer = CreateOptimizer(Currency.Gbp, out _);
 
             var result = optimizer.Optimise(system, maximumCost: 1.0);
@@ -49,9 +53,9 @@ namespace AlloyOptimisationUtilityTests
         public void Optimise_IsGeneric_WorksForNonNickelSystem()
         {
             // A completely different alloy system with a different base and element count.
-            var baseElement = new Element("Fe", costCoefficient: 2.0);
-            var manganese = new Element("Mn", costCoefficient: 3.0, creepCoefficient: 5.0E15);
-            var vanadium = new Element("V", costCoefficient: 25.0, creepCoefficient: 9.0E15);
+            var baseElement = new Element(ElementSymbol.Fe, costCoefficient: 2.0);
+            var manganese = new Element(ElementSymbol.Mn, costCoefficient: 3.0, creepCoefficient: 5.0E15);
+            var vanadium = new Element(ElementSymbol.V, costCoefficient: 25.0, creepCoefficient: 9.0E15);
 
             var system = new AlloySystem(baseElement, new[]
             {

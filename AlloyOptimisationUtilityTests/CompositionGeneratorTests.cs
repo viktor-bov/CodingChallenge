@@ -11,9 +11,9 @@ namespace AlloyOptimisationUtilityTests
         [Fact]
         public void Generate_RespectsMinimumMaximumAndStep()
         {
-            var element = new Element("A", costCoefficient: 1.0, creepCoefficient: 1.0);
+            var element = new Element(ElementSymbol.Cr, costCoefficient: 1.0, creepCoefficient: 1.0);
             var system = new AlloySystem(
-                new Element("Base", costCoefficient: 1.0),
+                new Element(ElementSymbol.Ni, costCoefficient: 1.0),
                 new[] { new ElementConstraint(element, minimum: 1.0, maximum: 2.0, step: 0.5) });
 
             var values = _generator.Generate(system)
@@ -27,9 +27,9 @@ namespace AlloyOptimisationUtilityTests
         [Fact]
         public void Generate_DoesNotYieldNegativeBalanceCompositions()
         {
-            var element = new Element("A", costCoefficient: 1.0, creepCoefficient: 1.0);
+            var element = new Element(ElementSymbol.Cr, costCoefficient: 1.0, creepCoefficient: 1.0);
             var system = new AlloySystem(
-                new Element("Base", costCoefficient: 1.0),
+                new Element(ElementSymbol.Ni, costCoefficient: 1.0),
                 new[] { new ElementConstraint(element, minimum: 0.0, maximum: 150.0, step: 50.0) });
 
             var compositions = _generator.Generate(system).ToList();
@@ -42,9 +42,9 @@ namespace AlloyOptimisationUtilityTests
         [Fact]
         public void Generate_ProducesFloatingPointSafeStepValues()
         {
-            var element = new Element("Nb", costCoefficient: 1.0, creepCoefficient: 1.0);
+            var element = new Element(ElementSymbol.Nb, costCoefficient: 1.0, creepCoefficient: 1.0);
             var system = new AlloySystem(
-                new Element("Base", costCoefficient: 1.0),
+                new Element(ElementSymbol.Ni, costCoefficient: 1.0),
                 new[] { new ElementConstraint(element, minimum: 0.0, maximum: 1.5, step: 0.1) });
 
             var values = _generator.Generate(system)
