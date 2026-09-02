@@ -1,6 +1,7 @@
 ﻿using AlloyOptimisation.Data;
 using AlloyOptimisationUtility.Models;
 using AlloyOptimisationUtility.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AlloyOptimisation
 {
@@ -8,17 +9,12 @@ namespace AlloyOptimisation
     {
         public static void Main()
         {
-            // The cost data comes from a repository abstraction. Today it is an in-memory
-            // mock; swapping it for real database connectivity requires no other changes.
-            IElementCostRepository costRepository = new MockElementCostRepository();
-            var alloyFactory = new NickelAlloyFactory(costRepository);
+            ServiceProvider serviceProvider = ConfigureServices();
 
+            var alloyFactory = serviceProvider.GetRequiredService<NickelAlloyFactory>();
             AlloySystem system = alloyFactory.CreateSystem();
 
-            ICompositionGenerator generator = new CompositionGenerator();
-            ICreepResistanceCalculator creepCalculator = new CreepResistanceCalculator();
-            ICostCalculator costCalculator = new CostCalculator(Currency.Gbp);
-            IAlloyOptimizer optimizer = new BruteForceAlloyOptimizer(generator, creepCalculator, costCalculator);
+            var optimizer = serviceProvider.GetRequiredService<IAlloyOptimizer>();
 
             OptimisationResult? result = optimizer.Optimise(system, NickelAlloyFactory.MaximumCost);
 
@@ -29,6 +25,23 @@ namespace AlloyOptimisation
             }
 
             //Console.WriteLine(OptimisationReportFormatter.Format(result));
+        }
+
+        private static ServiceProvider ConfigureServices()
+        {
+            // The cost data comes from a repository abstraction. Today it is an in-memory
+            // mock; swapping it for real database connectivity requires no other changes.
+            var services = new ServiceCollection();
+
+            services.AddSingleton<IElementCostRepository, MockElementCostRepository>();
+            services.AddSingleton<NickelAlloyFactory>();
+
+            services.AddSingleton<ICompositionGenerator, CompositionGenerator>();
+            services.AddSingleton<ICreepResistanceCalculator, CreepResistanceCalculator>();
+            services.AddSingleton<ICostCalculator>(_ => new CostCalculator(Currency.Gbp));
+            services.AddSingleton<IAlloyOptimizer, BruteForceAlloyOptimizer>();
+
+            return services.BuildServiceProvider();
         }
     }
 }

@@ -1,5 +1,8 @@
+using System.Diagnostics;
+
 namespace AlloyOptimisationUtility.Models
 {
+    [DebuggerDisplay("{Code}")]
     public sealed class Currency
     {
         public Currency(string code, string symbol)

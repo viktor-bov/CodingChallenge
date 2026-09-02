@@ -1,5 +1,8 @@
+using System.Diagnostics;
+
 namespace AlloyOptimisationUtility.Models
 {
+    [DebuggerDisplay("{Symbol}")]
     public sealed class Element
     {
         public Element(ElementSymbol symbol, double costCoefficient, double? creepCoefficient = null)

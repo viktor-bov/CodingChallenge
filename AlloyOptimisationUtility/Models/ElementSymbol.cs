@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace AlloyOptimisationUtility.Models
 {
     /// <summary>
@@ -6,28 +8,21 @@ namespace AlloyOptimisationUtility.Models
     /// </summary>
     public enum ElementSymbol
     {
-        /// <summary>Vanadium (atomic number 23).</summary>
+        [Display(Name = "Vanadium")]
         V = 23,
-
-        /// <summary>Chromium (atomic number 24).</summary>
+        [Display(Name = "Chromium")]
         Cr = 24,
-
-        /// <summary>Manganese (atomic number 25).</summary>
+        [Display(Name = "Manganese")]
         Mn = 25,
-
-        /// <summary>Iron (atomic number 26).</summary>
+        [Display(Name = "Iron")]
         Fe = 26,
-
-        /// <summary>Cobalt (atomic number 27).</summary>
+        [Display(Name = "Cobalt")]
         Co = 27,
-
-        /// <summary>Nickel (atomic number 28).</summary>
+        [Display(Name = "Nickel")]
         Ni = 28,
-
-        /// <summary>Niobium (atomic number 41).</summary>
+        [Display(Name = "Niobium")]
         Nb = 41,
-
-        /// <summary>Molybdenum (atomic number 42).</summary>
+        [Display(Name = "Molybdenum")]
         Mo = 42,
     }
 }
